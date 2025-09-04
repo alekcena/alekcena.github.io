@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Full-stack JavaScript/TypeScript — Алексей</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0B1220" />
+    <meta
+      name="description"
+      content="Full-stack JavaScript/TypeScript разработчик. Один стек: фронт, бэк, мобилки. Быстрые релизы, меньше хэнд-оффов, предсказуемая поставка. Telegram для связи."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./assets/favicon/favicon-16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/favicon/favicon-32.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWixZZS4Ttm5QYXVC1Z3O/1r+CYQFL8ZJijvW3O4s+7z3yB1g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+            colors: {
+              ts: {
+                50: "#eff6ff",
+                100: "#dbeafe",
+                200: "#bfdbfe",
+                300: "#93c5fd",
+                400: "#60a5fa",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                800: "#1e40af",
+                900: "#1e3a8a",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .noise {
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.06) 1px,
+          transparent 1px
+        );
+        background-size: 6px 6px;
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        align-items: flex-start;
+      }
+      .row-title {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgb(148 163 184);
+        white-space: nowrap;
+      }
+      .row-scroll {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        overflow: visible;
+        padding-bottom: 0;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        font-size: 13px;
+        line-height: 1.25;
+        padding: 0.4rem 0.75rem;
+        min-height: 36px;
+        white-space: nowrap;
+      }
+
+      @media (min-width: 640px) {
+        .row {
+          display: grid;
+          grid-template-columns: 96px 1fr;
+          gap: 2rem;
+          align-items: center;
+        }
+        .row-scroll {
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          padding-bottom: 0.25rem;
+          scrollbar-width: thin;
+        }
+      }
+
+      .row-scroll::-webkit-scrollbar {
+        height: 6px;
+      }
+      .row-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+      }
+      .gridlines {
+        background-image: linear-gradient(
+            #0000 31px,
+            rgba(255, 255, 255, 0.06) 32px
+          ),
+          linear-gradient(90deg, #0000 31px, rgba(255, 255, 255, 0.06) 32px);
+        background-size: 32px 32px;
+      }
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+      .floaty {
+        animation: floaty 6s ease-in-out infinite;
+      }
+      @media (max-width: 360px) {
+        .tight-stack {
+          gap: 0.5rem;
+        }
+      }
+      #stars {
+        position: fixed; /* фиксируем на экране */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* чтобы не перекрывало контент */
+      }
+
+      section {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 1s ease, transform 1s ease;
+      }
+
+      section.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .backdrop-blur {
+        background: rgba(15, 23, 42, 0.8); /* Запасной фон */
+      }
+      @supports (backdrop-filter: blur(10px)) {
+        .backdrop-blur {
+          background: rgba(15, 23, 42, 0.6);
+          backdrop-filter: blur(10px);
+        }
+      }
+      .hover\:text-ts-300:hover {
+        color: #93c5fd; /* Более яркий оттенок для ховера */
+      }
+      a[href="#contact"] {
+        transition: transform 0.2s ease;
+      }
+      a[href="#contact"]:hover {
+        transform: scale(1.05);
+      }
+      a[rel="noopener"]
+      {
+        transition: transform 0.2s ease;
+      }
+      a[rel="noopener"]:hover
+      {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body class="bg-slate-900 text-slate-100 font-sans scroll-smooth">
+    <canvas id="stars"></canvas>
+    <script>
+      const canvas = document.getElementById("stars");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const stars = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 3 + 1,
+        d: Math.random() * 0.5 + 0.2,
+        alpha: Math.random(),
+        dAlpha: Math.random() * 0.02,
+      }));
+
+      let lastTime = 0;
+      function draw(timestamp) {
+        if (timestamp - lastTime < 1000 / 30) {
+          // Ограничение до 30 FPS
+          requestAnimationFrame(draw);
+          return;
+        }
+        lastTime = timestamp;
+        ctx.fillStyle = "rgb(15, 23, 42)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#1d4ed8";
+        stars.forEach((s) => {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(29, 78, 216, ${s.alpha})`;
+          ctx.fill();
+          s.alpha += s.dAlpha;
+          if (s.alpha > 1 || s.alpha < 0) s.dAlpha = -s.dAlpha;
+          s.y += s.d;
+          if (s.y > canvas.height) s.y = 0;
+        });
+        requestAnimationFrame(draw);
+      }
+      draw(0);
+    </script>
+    <header class="fixed top-0 z-50 w-[100%]">
+      <div
+        class="backdrop-blur supports-[backdrop-filter]:bg-slate-900/60 bg-slate-900/80 border-b border-white/10"
+      >
+        <div
+          class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between"
+        >
+          <a href="#" class="flex items-center gap-2 min-w-0">
+            <img
+              src="./assets/svg/mascot.svg"
+              alt="Mascot"
+              class="w-6 h-6 shrink-0"
+            />
+            <span class="font-extrabold tracking-tight truncate"
+              >Aleksei • JS/TS</span
+            >
+          </a>
+          <nav class="hidden md:flex items-center gap-6 text-sm">
+            <a href="#about" class="hover:text-ts-300">Обо мне</a>
+            <a href="#services" class="hover:text-ts-300">Услуги</a>
+            <a href="#stack" class="hover:text-ts-300">Стек</a>
+            <a
+              href="#contact"
+              class="px-3 py-1.5 rounded-lg bg-ts-500/10 text-ts-300 border border-ts-400/30 hover:bg-ts-400/15"
+              >Связаться</a
+            >
+          </nav>
+        </div>
+      </div>
+    </header>
+    <section class="relative overflow-hidden min-h-screen flex items-center">
+      <div
+        class="absolute -top-32 -left-20 w-[520px] h-[520px] bg-ts-500/20 blur-[140px] rounded-full -z-10"
+      ></div>
+
+      <div
+        class="max-w-7xl mx-auto px-3 sm:px-6 pt-16 sm:pt-20 pb-10 sm:pb-16 w-full"
+      >
+        <div
+          class="grid lg:grid-cols-[1.2fr_.8fr] gap-6 sm:gap-10 items-center"
+        >
+          <div>
+            <div
+              class="inline-flex items-center gap-2 text-[11px] sm:text-xs px-3 py-1 rounded-full bg-ts-400/10 text-ts-300 border border-ts-400/20"
+            >
+              100% JS/TS • Front + Back + Mobile
+            </div>
+            <h1
+              class="mt-4 text-[26px] leading-[1.15] sm:text-4xl sm:leading-[1.1] md:text-6xl font-extrabold tracking-[-0.02em]"
+            >
+              Проекты под ключ на
+              <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-ts-300 via-ts-400 to-ts-200"
+                >JavaScript/TypeScript</span
+              >
+            </h1>
+            <p
+              class="mt-4 text-slate-300 text-base sm:text-lg leading-7 sm:leading-8 max-w-2xl"
+            >
+              Один разработчик, один стек: меньше хэнд-оффов, быстрее релизы и
+              предсказуемая поставка. Фокус на качестве и долгосрочном
+              сотрудничестве.
+            </p>
+            <div class="mt-5 sm:mt-6 flex flex-wrap gap-3">
+              <a
+                href="#contact"
+                class="w-[100%] text-center sm:w-[auto] px-5 py-3 rounded-xl bg-gradient-to-r from-ts-400 to-ts-600 text-slate-900 font-semibold shadow-[0_10px_30px_-10px_rgba(59,130,246,.6)] hover:opacity-95"
+                >Обсудить проект</a
+              >
+              <!-- <a
+                href="#work"
+                class="w-[100%] text-center sm:w-[auto] px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5"
+                >Смотреть кейсы</a
+              > -->
+            </div>
+
+            <div class="mt-8 grid grid-cols-3 gap-3 max-w-xl">
+              <div
+                class="rounded-3xl border border-white/10 bg-white/5 p-2 text-center"
+              >
+                <div class="text-xl sm:text-2xl font-extrabold text-white">
+                  8+
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">лет с JS/TS</div>
+              </div>
+              <div
+                class="rounded-3xl border border-white/10 bg-white/5 p-2 text-center"
+              >
+                <div class="text-xl sm:text-2xl font-extrabold text-white">
+                  20+
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                  релизов с нуля
+                </div>
+              </div>
+              <div
+                class="rounded-3xl border border-white/10 bg-white/5 p-2 text-center"
+              >
+                <div class="text-xl sm:text-2xl font-extrabold text-white">
+                  2–4
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">недели MVP</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div
+              class="rounded-[28px] p-[1.5px] bg-gradient-to-r from-ts-400 via-ts-500 to-ts-700 shadow-[0_20px_60px_-25px_rgba(29,78,216,.45)]"
+            >
+              <div
+                class="rounded-[26px] gridlines bg-[#0B1220] noise text-slate-100 relative overflow-hidden p-5 sm:p-8"
+              >
+                <h3 class="text-lg sm:text-xl font-bold">
+                  Почему единый стек — быстрее
+                </h3>
+                <p class="mt-2 text-sm text-slate-300">
+                  Сквозные типы/DTO, общие утилиты и меньше «переводов» между
+                  слоями → предсказуемые релизы.
+                </p>
+
+                <div
+                  class="mt-4 rounded-xl border border-white/10 bg-[#0D162A] p-3"
+                >
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-300">Время поставки</span>
+                    <span
+                      class="px-2 py-0.5 rounded bg-ts-400/10 text-ts-300 border border-ts-400/20"
+                      >↓ ~30%</span
+                    >
+                  </div>
+                  <div class="mt-3 space-y-2">
+                    <div class="flex items-center gap-3">
+                      <span class="text-[10px] text-slate-400 w-24 shrink-0"
+                        >Разные языки</span
+                      >
+                      <div class="h-2.5 w-full rounded bg-slate-600/30">
+                        <div
+                          class="h-2.5 rounded bg-slate-300/80"
+                          style="width: 78%"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="text-[10px] text-slate-400 w-24 shrink-0"
+                        >JS/TS-first</span
+                      >
+                      <div class="h-2.5 w-full rounded bg-slate-600/30">
+                        <div
+                          class="h-2.5 rounded bg-ts-400/80"
+                          style="width: 54%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <img
+                  src="./assets/svg/mascot.svg"
+                  alt=""
+                  class="absolute -top-3 -right-3 w-24 h-24 sm:w-32 sm:h-32 floaty select-none pointer-events-none opacity-90"
+                  draggable="false"
+                />
+                <img
+                  src="./assets/svg/mascot.svg"
+                  alt=""
+                  class="absolute -bottom-8 -left-10 w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] opacity-[0.06] -rotate-12 pointer-events-none select-none"
+                  draggable="false"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="about" class="py-4 sm:py-16">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6">
+        <header class="flex items-end justify-between">
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-[-0.02em]">
+            Обо мне
+          </h2>
+        </header>
+
+        <div
+          class="mt-6 rounded-[18px] p-[1px] bg-gradient-to-r from-ts-400/25 via-ts-500/20 to-ts-700/20"
+        >
+          <div
+            class="rounded-[16px] bg-[#0B1220] border border-white/10 overflow-hidden relative"
+          >
+            <div
+              class="pointer-events-none absolute top-24 -left-24 w-[420px] h-[420px] bg-ts-500/10 blur-[120px] rounded-full"
+            ></div>
+            <div
+              class="pointer-events-none absolute -bottom-24 right-24 w-[420px] h-[420px] bg-ts-500/10 blur-[120px] rounded-full"
+            ></div>
+
+            <div
+              class="grid lg:grid-cols-[1.15fr_.85fr] gap-6 sm:gap-8 p-5 sm:p-8"
+            >
+              <div>
+                <div class="flex items-center gap-3">
+                  <div class="min-w-0">
+                    <div class="text-xs text-slate-400">
+                      Алексей, разработчик
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold">
+                      8 лет в ИТ: от серверов Minecraft до продакшн‑сервисов
+                    </h3>
+                  </div>
+                </div>
+
+                <p class="mt-4 text-slate-300 leading-7">
+                  Начинал школьником: поднимал
+                  <span class="whitespace-nowrap">Minecraft‑сервера</span>,
+                  писал скрипты и конфиги, чтобы всё летало на дешёвом VPS. С
+                  тех пор путь — через пет‑проекты, фриланс и продуктовые
+                  команды — вывел к одному стеку:
+                  <span class="text-slate-200 font-semibold"
+                    >JavaScript/TypeScript</span
+                  >
+                  для фронтенда и бэкенда. Люблю, когда типы проходят сквозь
+                  весь проект, а релизы предсказуемы.
+                </p>
+
+                <p class="mt-3 text-slate-300 leading-7">
+                  Чем могу быть полезен: собрать MVP быстро и аккуратно,
+                  подтянуть существующий проект (скорость, DX, архитектура),
+                  подключиться к команде и закрыть кусок функционала. Пишу
+                  прозрачно: превью‑сборки, заметки к релизу, план отката.
+                  Коммуникация — коротко, по делу, с конкретными сроками и
+                  критериями готовности.
+                </p>
+
+                <!-- <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <div class="text-xl sm:text-2xl font-extrabold">8+</div>
+                    <div class="text-[11px] text-slate-400 mt-1">лет коммерческой разработки</div>
+                  </div>
+                  <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <div class="text-xl sm:text-2xl font-extrabold">20+</div>
+                    <div class="text-[11px] text-slate-400 mt-1">запущенных проектов</div>
+                  </div>
+                  <div class="rounded-xl border border-white/10 bg-white/5 p-3 col-span-2 sm:col-span-1">
+                    <div class="text-xl sm:text-2xl font-extrabold">2–4</div>
+                    <div class="text-[11px] text-slate-400 mt-1">недели до первой версии</div>
+                  </div>
+                </div> -->
+
+                <div class="mt-6 grid sm:grid-cols-3 gap-3 text-sm">
+                  <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <div class="font-semibold">Простота &gt; сложность</div>
+                    <div class="text-slate-400 mt-1">
+                      Минимум магии, понятные контракты.
+                    </div>
+                  </div>
+                  <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <div class="font-semibold">Скорость с качеством</div>
+                    <div class="text-slate-400 mt-1">
+                      Типы, линтеры, автотесты на критическое.
+                    </div>
+                  </div>
+                  <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <div class="font-semibold">Прозрачность</div>
+                    <div class="text-slate-400 mt-1">
+                      Демо, превью‑линки, заметки к релизу.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <h4 class="font-semibold">Профили и контакты</h4>
+                  <div class="mt-4 grid grid-cols-2 gap-3 text-sm tight-stack">
+                    <a
+                      href="https://www.linkedin.com/in/alekcena/"
+                      target="_blank"
+                      rel="noopener"
+                      class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#0B1220] px-3 py-2 hover:bg-white/5"
+                    >
+                      <img src="./assets/svg/linkedin.svg" alt="LinkedIn" class="w-4 h-4"/>
+                      LinkedIn
+                    </a>
+                    <a
+                      href="https://github.com/alekcena"
+                      target="_blank"
+                      rel="noopener"
+                      class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#0B1220] px-3 py-2 hover:bg-white/5"
+                    >
+                      <img src="./assets/svg/github.svg" alt="GitHub" class="w-4 h-4"/>
+                      GitHub
+                    </a>
+                    <a
+                      href="https://www.upwork.com/freelancers/alekcena"
+                      target="_blank"
+                      rel="noopener"
+                      class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#0B1220] px-3 py-2 hover:bg-white/5"
+                    >
+                      <img src="./assets/svg/upwork.svg" alt="Upwork" class="w-4 h-4"/>
+                      Upwork
+                    </a>
+                    <a
+                      href="https://kwork.ru/user/alekcena"
+                      target="_blank"
+                      rel="noopener"
+                      class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#0B1220] px-3 py-2 hover:bg-white/5"
+                    >
+                      <img src="./assets/svg/kwork.svg" alt="Kwork" class="w-4 h-4"/>
+                      Kwork
+                    </a>
+                    <a
+                      href="https://t.me/alekcena"
+                      target="_blank"
+                      rel="noopener"
+                      class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#0B1220] px-3 py-2 hover:bg-white/5"
+                    >
+                      <img src="./assets/svg/telegram.svg" alt="Telegram" class="w-4 h-4"/>
+                      Telegram
+                    </a>
+                    <a
+                      href="mailto:alekcena@icloud.com"
+                      class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#0B1220] px-3 py-2 hover:bg-white/5"
+                    >
+                      <img src="./assets/svg/mail.svg" alt="Email" class="w-4 h-4"/>
+                      Email
+                    </a>
+                  </div>
+                  <div class="text-slate-300 text-sm mt-4">
+                    Открыт к проектам:
+                  </div>
+                  <ul class="mt-2 text-xs text-slate-400 space-y-1">
+                    <li>• Разработка и доработка веб‑сервисов</li>
+                    <li>• Подключение к существующей команде</li>
+                    <li>• Интеграции, оптимизация, поддержка</li>
+                  </ul>
+                  <a
+                    href="#contact"
+                    class="mt-8 w-[100%] justify-center text-center mt-3 inline-flex gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-ts-400 to-ts-600 text-slate-900 font-semibold hover:opacity-95"
+                  >
+                    Обсудить задачу
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="services" class="py-8 sm:py-14">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6">
+        <div class="flex items-end justify-between">
+          <h2 class="text-3xl font-extrabold tracking-[-0.02em]">
+            Чем могу помочь
+          </h2>
+        </div>
+        <div class="mt-6 grid md:grid-cols-3 gap-6">
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <h3 class="font-semibold text-lg">MVP под ключ</h3>
+            <p class="mt-2 text-sm text-slate-300">
+              2–4 недели до первой версии: архитектура, UI-система, релиз.
+            </p>
+            <ul class="mt-3 text-xs text-slate-400 space-y-1">
+              <li>• Дорожная карта и приоритизация</li>
+              <li>• Превью-сборки каждую неделю</li>
+              <li>• Документация и handover</li>
+            </ul>
+          </div>
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <h3 class="font-semibold text-lg">Внутренние инструменты</h3>
+            <p class="mt-2 text-sm text-slate-300">
+              Панели управления, отчёты, интеграции, права доступа.
+            </p>
+            <ul class="mt-3 text-xs text-slate-400 space-y-1">
+              <li>• Роли/политики, аудит линий данных</li>
+              <li>• Оптимизация производительности</li>
+              <li>• Удобство для операторов</li>
+            </ul>
+          </div>
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <h3 class="font-semibold text-lg">Аудит/ускорение</h3>
+            <p class="mt-2 text-sm text-slate-300">
+              Оптимизация скорости, DX, настройка CI/CD, устранение узких мест.
+            </p>
+            <ul class="mt-3 text-xs text-slate-400 space-y-1">
+              <li>• Замер узких мест и план работ</li>
+              <li>• Сквозные типы и стандарты</li>
+              <li>• Быстрые улучшения за 1–2 недели</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="stack" class="py-4 sm:py-10">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6">
+        <div
+          class="rounded-[16px] p-[1px] bg-gradient-to-r from-ts-400/25 via-ts-500/20 to-ts-700/20"
+        >
+          <div class="rounded-[15px] bg-[#0B1220] border border-white/10">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-3 sm:px-4 py-3"
+            >
+              <h2
+                class="text-xl sm:text-2xl font-extrabold tracking-[-0.02em] flex items-center gap-2"
+              >
+                Стек
+              </h2>
+
+              <div
+                class="grid grid-cols-2 w-full sm:w-auto rounded-lg border border-white/10 bg-white/5 text-sm"
+              >
+                <button
+                  id="seg-fe"
+                  class="px-4 py-2 rounded-l-lg data-[on=true]:bg-ts-500/15 data-[on=true]:text-ts-200"
+                >
+                  Frontend
+                </button>
+                <button
+                  id="seg-be"
+                  class="px-4 py-2 rounded-r-lg data-[on=true]:bg-ts-500/15 data-[on=true]:text-ts-200"
+                >
+                  Backend
+                </button>
+              </div>
+            </div>
+
+            <div class="px-3 sm:px-4 pb-4">
+              <div class="rounded-lg border border-white/10 bg-white/5">
+                <div class="p-3 sm:p-4">
+                  <div id="pane-fe" class="space-y-3">
+                    <div class="row">
+                      <div class="row-title">Core</div>
+                      <div class="row-scroll">
+                        <span class="chip">JavaScript</span
+                        ><span class="chip">TypeScript</span>
+                        <span class="chip">React</span
+                        ><span class="chip">Next.js</span>
+                        <span class="chip">React Router</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">State & Data</div>
+                      <div class="row-scroll">
+                        <span class="chip">Effector</span
+                        ><span class="chip">Redux</span
+                        ><span class="chip">Redux Toolkit</span>
+                        <span class="chip">redux-thunk</span
+                        ><span class="chip">MobX</span
+                        ><span class="chip">React Query</span>
+                        <span class="chip">immer</span
+                        ><span class="chip">OpenAPI</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Forms</div>
+                      <div class="row-scroll">
+                        <span class="chip">React Hook Form</span
+                        ><span class="chip">Zod</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">i18n</div>
+                      <div class="row-scroll">
+                        <span class="chip">i18n</span
+                        ><span class="chip">i18next</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Network</div>
+                      <div class="row-scroll">
+                        <span class="chip">axios</span
+                        ><span class="chip">JWT</span>
+                        <span class="chip">WebSocket</span
+                        ><span class="chip">Socket.io</span>
+                        <span class="chip">CDN</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">UI</div>
+                      <div class="row-scroll">
+                        <span class="chip">Tailwind CSS</span
+                        ><span class="chip">CSS Modules</span
+                        ><span class="chip">styled-components</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Graphics</div>
+                      <div class="row-scroll">
+                        <span class="chip">SVG</span
+                        ><span class="chip">Three.js</span
+                        ><span class="chip">Canvas</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Quality</div>
+                      <div class="row-scroll">
+                        <span class="chip">Jest</span
+                        ><span class="chip">Sentry</span
+                        ><span class="chip">Firebase</span
+                        ><span class="chip">Firebase A/B</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Utils</div>
+                      <div class="row-scroll">
+                        <span class="chip">lodash</span
+                        ><span class="chip">uuid</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Tooling</div>
+                      <div class="row-scroll">
+                        <span class="chip">Vite</span
+                        ><span class="chip">Webpack</span
+                        ><span class="chip">Babel</span>
+                        <span class="chip">ESLint</span
+                        ><span class="chip">Prettier</span
+                        ><span class="chip">Stylelint</span>
+                        <span class="chip">Husky</span
+                        ><span class="chip">lint-staged</span
+                        ><span class="chip">commitlint</span>
+                        <span class="chip">npm</span
+                        ><span class="chip">yarn</span
+                        ><span class="chip">pnpm</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Deploy / Maps</div>
+                      <div class="row-scroll">
+                        <span class="chip">Vercel</span
+                        ><span class="chip">Netlify</span>
+                        <span class="chip">Google Maps</span
+                        ><span class="chip">Yandex Maps</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="pane-be" class="space-y-3 hidden">
+                    <div class="row">
+                      <div class="row-title">Core</div>
+                      <div class="row-scroll">
+                        <span class="chip">JavaScript</span
+                        ><span class="chip">TypeScript</span>
+                        <span class="chip">Node.js</span
+                        ><span class="chip">Nest.js</span
+                        ><span class="chip">Express.js</span>
+                        <span class="chip">Zod</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">DB & ORM</div>
+                      <div class="row-scroll">
+                        <span class="chip">PostgreSQL</span
+                        ><span class="chip">MongoDB</span>
+                        <span class="chip">Prisma</span
+                        ><span class="chip">Redis</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Jobs / RT</div>
+                      <div class="row-scroll">
+                        <span class="chip">node-cron</span
+                        ><span class="chip">WebSocket</span
+                        ><span class="chip">Socket.io</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Security</div>
+                      <div class="row-scroll">
+                        <span class="chip">JWT</span
+                        ><span class="chip">Sentry</span
+                        ><span class="chip">Jest</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Comms</div>
+                      <div class="row-scroll">
+                        <span class="chip">Nodemailer</span
+                        ><span class="chip">WebPush</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Infra</div>
+                      <div class="row-scroll">
+                        <span class="chip">swagger</span
+                        ><span class="chip">docker</span
+                        ><span class="chip">docker-compose</span>
+                        <span class="chip">kubernetes</span
+                        ><span class="chip">nginx</span
+                        ><span class="chip">Cloudflare</span>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="row-title">Money</div>
+                      <div class="row-scroll">
+                        <span class="chip">Dinero.js</span
+                        ><span class="chip">decimal.js</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const feBtn = document.getElementById("seg-fe");
+          const beBtn = document.getElementById("seg-be");
+          const fe = document.getElementById("pane-fe");
+          const be = document.getElementById("pane-be");
+          function set(onFE) {
+            feBtn.dataset.on = onFE ? "true" : "false";
+            beBtn.dataset.on = onFE ? "false" : "true";
+            fe.classList.toggle("hidden", !onFE);
+            be.classList.toggle("hidden", onFE);
+          }
+          feBtn.addEventListener("click", () => set(true));
+          beBtn.addEventListener("click", () => set(false));
+          set(true);
+        })();
+      </script>
+    </section>
+
+    <section id="contact" class="py-8 sm:py-16">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6">
+        <div
+          class="rounded-[28px] p-[1.5px] bg-gradient-to-r from-ts-400 via-ts-500 to-ts-700"
+        >
+          <div
+            class="rounded-[26px] bg-[#0B1220] noise relative overflow-hidden p-5 sm:p-10"
+          >
+            <div
+              class="grid md:grid-cols-[1.1fr_.9fr] gap-6 sm:gap-8 items-center"
+            >
+              <div>
+                <h2 class="text-3xl font-extrabold tracking-[-0.02em]">
+                  Обсудим вашу задачу
+                </h2>
+                <p class="mt-3 text-slate-300">
+                  Коротко опишите цель, сроки и ограничения — предложу
+                  реалистичную дорожную карту и старт без лишней бюрократии.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-3 w-[100%]">
+                  <a
+                    href="https://t.me/alekcena"
+                    target="_blank"
+                    rel="noopener"
+                    class="px-5 py-3 rounded-xl bg-gradient-to-r from-ts-400 to-ts-600 text-slate-900 font-semibold justify-center w-full text-center sm:w-auto"
+                    >Написать в Telegram</a
+                  >
+                  <!-- <a
+                    href="#process"
+                    class="px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5"
+                    >Смотреть процесс</a
+                  > -->
+                </div>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <h3 class="font-semibold">Что прислать</h3>
+                <ul class="mt-2 text-sm text-slate-300 space-y-2">
+                  <li>• 2–3 абзаца о продукте и пользователях</li>
+                  <li>• Текущие макеты/материалы (если есть)</li>
+                  <li>• Желаемые сроки и бюджетный коридор</li>
+                </ul>
+              </div>
+            </div>
+
+            <img
+              src="./assets/svg/mascot.svg"
+              alt=""
+              class="absolute -bottom-10 -left-10 w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] opacity-[0.06] -rotate-6 pointer-events-none select-none"
+              draggable="false"
+            />
+            <img
+              src="./assets/svg/mascot.svg"
+              alt=""
+              class="absolute top-4 right-4 w-20 h-20 sm:w-28 sm:h-28 floaty select-none pointer-events-none"
+              draggable="false"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-white/10">
+      <div
+        class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+      >
+        <div class="flex items-center gap-4 text-sm">
+          <a href="#about" class="hover:text-ts-300">Обо мне</a>
+          <a href="#services" class="hover:text-ts-300">Услуги</a>
+          <a href="#stack" class="hover:text-ts-300">Стек</a>
+          <a
+            href="https://t.me/alekcena"
+            target="_blank"
+            rel="noopener"
+            class="px-3 py-1.5 rounded-lg bg-ts-500/10 text-ts-300 border border-ts-400/30 hover:bg-ts-400/15"
+            >Telegram</a
+          >
+        </div>
+      </div>
+    </footer>
+    <script>
+      const sections = document.querySelectorAll("section");
+
+      function revealSections() {
+        const triggerBottom = window.innerHeight * 0.85;
+        sections.forEach((section) => {
+          const sectionTop = section.getBoundingClientRect().top;
+          if (sectionTop < triggerBottom) {
+            section.classList.add("visible");
+          }
+        });
+      }
+
+      window.addEventListener("scroll", revealSections);
+      window.addEventListener("load", revealSections);
+    </script>
+  </body>
+</html>
